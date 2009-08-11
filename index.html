@@ -1,69 +1,81 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<title>Shouter</title>
-	<script src="./lib/prototype.js" type="text/javascript"></script>
-	<script src="./src/shouter" type="text/javascript"></script>
-	<script type="text/javascript">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Shouter</title>
+    <script src="./lib/prototype.js" type="text/javascript"></script>
+    <script src="./src/shouter" type="text/javascript"></script>
+    <script type="text/javascript">
         document.observe("dom:loaded", function() {
-        	// Dummy class for implementing Shouter mixin.
-        	var TestShouter1 = Class.create(Shouter, {
-        		initialize: function( ) { },
-        		toString: function() { return "[object TestShouter1]"; }
-        	});
+            // Dummy class for implementing *Shouter* mixin.
+            var ShouterTest = Class.create(Shouter, {
+                initialize: function( ) { },
+                toString: function() { return "[object ShouterTest]"; }
+            });
 
-        	// Dummy class for implementing Reactor mixin.
-        	var TestReactor1 = Class.create(Reactor, {
-        		initialize: function(shouter) {
-        			this.listen(shouter);
-        		},
+            // Dummy class for implementing *Reactor* mixin.
+            var ReactorTest = Class.create(Reactor, {
+                initialize: function(shouter) {
+                    // Listen to the shouter
+                    this.listen(shouter);
+                },
 
-        		__reactToStuff: function(source, name, was, is) {
-        			console.log("Stuff!", source, name, was, is);
-        		},
+                // When the "stuff" property is set
+                __reactToStuff: function(source, name, was, is) {
+                    console.log("Stuff!", source, name, was, is);
+                },
 
-        		__reactToInnerHTML: function(source, name, was, is) {
-        			console.log("innerHTML!", source, name, was, is);
-        		},
+                // When the "innerHTML" property is set
+                __reactToInnerHTML: function(source, name, was, is) {
+                    console.log("innerHTML!", source, name, was, is);
+                },
 
-        		__reactTo_$: function(source, name, was, is) {
-        			console.log("Other stuff!", source, name, was, is);
-        		},
+                // When the any property is set and doesn't have a custom handler
+                __reactTo_$: function(source, name, was, is) {
+                    console.log("Other stuff!", source, name, was, is);
+                },
 
-        		toString: function() { return "[object TestReactor1]"; }
-        	});
+                toString: function() { return "[object ReactorTest]"; }
+            });
 
-        	// Create a shouter and a reactor
-        	var s1 = new TestShouter1();
-        	var r1 = new TestReactor1(s1);
+            // Create a shouter
+            var s1 = new ShouterTest();
+
+            // Reactor to watch the Shouter
+            var r1 = new ReactorTest(s1);
 
             // Set some properties on the shouter, reactor should respond.
-        	s1.set("stuff", "cool");
-        	s1.set("stuff", 5);
+            s1.set("stuff", "cool");
+            s1.set("stuff", 5);
 
-            // Set some properties on the shouter, reactor should respond.
-        	var s2 = new TestShouter1();
-        	var r2 = new TestReactor1(s2);
+            // Create another shouter
+            var s2 = new ShouterTest();
+            
+            // Another Reactor to respond to new shouter
+            var r2 = new ReactorTest(s2);
 
-        	s2.set("stuff", "lame");
+            // Set property on the new shouter; new reactor should respond
+            s2.set("stuff", "lame");
             
             // Stop reacting to s2. Next "set" shouldn't provoke response.
-         	r2.ignore(s2);
-        	s2.set("stuff", 2000);
+            r2.ignore(s2);
+            s2.set("stuff", 2000);
 
             // Make HTML Elements into Shouters
-        	Element.addMethods(Shouter);
+            Element.addMethods(Shouter);
 
-            // Find the H1
-        	var s3 = $$("h1").first();
-        	// Watch it with a reactor
-        	var r3 = new TestReactor1(s3);
-                
-            // Set the innerHTML, the reactor should respond.
-        	s3.set("innerHTML", "OMG Fucking Rad.");
+            // Find the H1, which is now a Shouter, as ALL ELEMENTS ARE.
+            var s3 = $$("h1").first();
+
+            // Watch it with a reactor
+            var r3 = new ReactorTest(s3);
+
+            setTimeout(function() {
+                // Set the innerHTML, the reactor should respond.
+                s3.set("innerHTML", "OMG Fucking Rad.");
+            }, 1000);
         });
-	</script>
+    </script>
 </head>
 <body>
     <h1>Hello</h1>

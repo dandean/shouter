@@ -1,5 +1,5 @@
 /**
- *  mixin Watchable
+ *  mixin Shouter
  *  Mixin for adding sproutcore-style property watching... kinda.
  *  todo: - examples with UI elements
  *        - investigate potential performance issues

@@ -4,46 +4,47 @@
  *  todo: - examples with UI elements
  *        - investigate potential performance issues
  **/
-var Shouter = {
+var ObjectShouter = {
 	// Private method for getting the unique id for the object.
-	_getShoutID: function() {
-		if (Object.isUndefined(this._id)) {
-			this._id = Object.isFunction(this.identify) ? this.identify() : "shouter-" + Math.random();
+	_getShoutID: function(object) {
+		if (Object.isUndefined(object._id)) {
+			object._id = Object.isFunction(object.identify) ? object.identify() : "shouter-" + Math.random();
 		}
-		return this._id;
+		return object._id;
 	},
 	
 	/**
-	 *  Shouter#set(prop, value) -> this
+	 *  Shouter#set(@object, prop, value) -> this
 	 *  Sets the property on this object to the specified value, then notifies all watchers.
 	 **/
-	set: function(prop, value) {
-		var scope = this;
-		if (arguments.length == 3) {
-			scope = arguments[0]; prop = arguments[1]; value = arguments[2];
-		}
-
-		if (scope[prop] != value) {
-			var was = scope[prop];
-			scope[prop] = value;
+	set: function(object, prop, value) {
+		if (object[prop] != value) {
+			var was = object[prop];
+			object[prop] = value;
 			
-			document.fire("shout:" + scope._getShoutID(), {
-				source: scope,
+			document.fire("shout:" + object._getShoutID(), {
+				source: object,
 				name:   prop,
 				was:    was,
-				is:     scope[prop]
+				is:     object[prop]
 			});
 		}
-		return this;
+		return object;
 	},
 
 	/**
-	 *  Shouter#get(prop) -> object
+	 *  Shouter#get(@object, prop) -> object
 	 *  Gets the value from the object.
 	 **/
-	get: function(prop) {
-		return this[prop];
+	get: function(object, prop) {
+		return object[prop];
 	}
+};
+
+var Shouter = {
+	_getShoutID: ObjectShouter._getShoutID.methodize(),
+	set: ObjectShouter.set.methodize(),
+	get: ObjectShouter.get.methodize()
 };
 
 /**
